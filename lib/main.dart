@@ -11,8 +11,23 @@ void main() {
   runApp(const MyApp());
 }
 
-class MyApp extends StatelessWidget {
+class MyApp extends StatefulWidget {
   const MyApp({Key? key}) : super(key: key);
+
+  @override
+  State<MyApp> createState() => _MyAppState();
+}
+
+class _MyAppState extends State<MyApp> {
+  ThemeMode _themeMode = ThemeMode.system;
+
+  void _toggleTheme() {
+    setState(() {
+      _themeMode = _themeMode == ThemeMode.dark
+          ? ThemeMode.light
+          : ThemeMode.dark;
+    });
+  }
 
   @override
   Widget build(BuildContext context) {
@@ -22,15 +37,43 @@ class MyApp extends StatelessWidget {
         primarySwatch: Colors.blue,
         visualDensity: VisualDensity.adaptivePlatformDensity,
         useMaterial3: true,
+        brightness: Brightness.light,
+        scaffoldBackgroundColor: Colors.grey[100],
+        cardColor: Colors.white,
+        appBarTheme: const AppBarTheme(
+          backgroundColor: const Color(0xFF2196F3),
+          foregroundColor: Colors.white,
+          elevation: 0,
+        ),
       ),
-      home: const HomePage(),
+      darkTheme: ThemeData(
+        primarySwatch: Colors.blue,
+        visualDensity: VisualDensity.adaptivePlatformDensity,
+        useMaterial3: true,
+        brightness: Brightness.dark,
+        scaffoldBackgroundColor: const Color(0xFF0A0A0A), // เกือบดำ แต่อ่านง่าย
+        cardColor: const Color(0xFF1E1E1E), // สี card ที่อ่านง่าย
+        appBarTheme: const AppBarTheme(
+          backgroundColor: Color(0xFF1A1A1A), // สีแถบบน สุขุม
+          foregroundColor: Colors.white,
+          elevation: 0,
+        ),
+        floatingActionButtonTheme: const FloatingActionButtonThemeData(
+          backgroundColor: Color(0xFF2196F3), // น้ำเงินอ่อน
+          foregroundColor: Colors.white,
+        ),
+      ),
+      themeMode: _themeMode,
+      home: HomePage(onToggleTheme: _toggleTheme),
       debugShowCheckedModeBanner: false,
     );
   }
 }
 
 class HomePage extends StatefulWidget {
-  const HomePage({Key? key}) : super(key: key);
+  final VoidCallback onToggleTheme;
+
+  const HomePage({Key? key, required this.onToggleTheme}) : super(key: key);
 
   @override
   State<HomePage> createState() => _HomePageState();
@@ -99,11 +142,15 @@ class _HomePageState extends State<HomePage> {
 
   @override
   Widget build(BuildContext context) {
+    final isDark = Theme.of(context).brightness == Brightness.dark;
+    final backgroundColor = isDark ? const Color(0xFF0A0A0A) : Colors.grey[200];
+    final headerColor = isDark ? const Color(0xFF1A1A1A) : Colors.blue;
+
     return Scaffold(
-      backgroundColor: Colors.grey[200],
+      backgroundColor: backgroundColor,
       appBar: AppBar(
         title: const Text('Todo Calendar'),
-        backgroundColor: Colors.blue,
+        backgroundColor: headerColor,
         foregroundColor: Colors.white,
         elevation: 0,
         actions: [
@@ -113,9 +160,9 @@ class _HomePageState extends State<HomePage> {
             tooltip: 'Today',
           ),
           IconButton(
-            icon: const Icon(Icons.refresh),
-            onPressed: _loadTodos,
-            tooltip: 'Refresh',
+            icon: Icon(isDark ? Icons.light_mode : Icons.dark_mode),
+            onPressed: widget.onToggleTheme,
+            tooltip: 'Toggle Theme',
           ),
         ],
       ),
@@ -123,7 +170,7 @@ class _HomePageState extends State<HomePage> {
         children: [
           // Date Selector Header
           Container(
-            color: Colors.blue,
+            color: headerColor,
             child: Padding(
               padding: const EdgeInsets.all(16.0),
               child: Row(
@@ -198,7 +245,7 @@ class _HomePageState extends State<HomePage> {
           // Todo List
           Expanded(
             child: Container(
-              color: Colors.grey[200],
+              color: backgroundColor,
               child: _todos.isEmpty
                   ? Center(
                       child: Column(
@@ -207,14 +254,18 @@ class _HomePageState extends State<HomePage> {
                           Icon(
                             Icons.event_note,
                             size: 80,
-                            color: Colors.grey[400],
+                            color: isDark
+                                ? const Color(0xFF404040)
+                                : Colors.grey[400],
                           ),
                           const SizedBox(height: 16),
                           Text(
                             'No tasks for today',
                             style: TextStyle(
                               fontSize: 18,
-                              color: Colors.grey[600],
+                              color: isDark
+                                  ? const Color(0xFFB0B0B0)
+                                  : Colors.grey[600],
                               fontWeight: FontWeight.w500,
                             ),
                           ),
@@ -223,7 +274,9 @@ class _HomePageState extends State<HomePage> {
                             'Tap + to add a new task',
                             style: TextStyle(
                               fontSize: 14,
-                              color: Colors.grey[500],
+                              color: isDark
+                                  ? const Color(0xFF808080)
+                                  : Colors.grey[500],
                             ),
                           ),
                         ],

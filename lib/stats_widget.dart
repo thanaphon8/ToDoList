@@ -7,29 +7,36 @@ class StatsWidget extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) {
+    final isDark = Theme.of(context).brightness == Brightness.dark;
+
     if (stats['total']! == 0) return const SizedBox.shrink();
 
     return Container(
-      color: Colors.white,
+      color: isDark ? const Color(0xFF21262D) : Colors.white,
       padding: const EdgeInsets.all(16),
       child: Row(
         mainAxisAlignment: MainAxisAlignment.spaceAround,
         children: [
-          _buildStatChip('All', stats['total']!, Colors.blue),
-          _buildStatChip('Completed', stats['completed']!, Colors.green),
-          _buildStatChip('Pending', stats['pending']!, Colors.orange),
+          _buildStatChip('All', stats['total']!, Colors.blue, isDark),
+          _buildStatChip(
+            'Completed',
+            stats['completed']!,
+            Colors.green,
+            isDark,
+          ),
+          _buildStatChip('Pending', stats['pending']!, Colors.orange, isDark),
         ],
       ),
     );
   }
 
-  Widget _buildStatChip(String label, int value, Color color) {
+  Widget _buildStatChip(String label, int value, Color color, bool isDark) {
     return Container(
       padding: const EdgeInsets.symmetric(horizontal: 12, vertical: 6),
       decoration: BoxDecoration(
-        color: color.withOpacity(0.1),
+        color: color.withOpacity(isDark ? 0.2 : 0.1),
         borderRadius: BorderRadius.circular(16),
-        border: Border.all(color: color.withOpacity(0.3)),
+        border: Border.all(color: color.withOpacity(isDark ? 0.4 : 0.3)),
       ),
       child: Row(
         mainAxisSize: MainAxisSize.min,
@@ -39,11 +46,17 @@ class StatsWidget extends StatelessWidget {
             style: TextStyle(
               fontSize: 16,
               fontWeight: FontWeight.bold,
-              color: color,
+              color: isDark ? color.withOpacity(0.8) : color,
             ),
           ),
           const SizedBox(width: 4),
-          Text(label, style: TextStyle(fontSize: 12, color: color)),
+          Text(
+            label,
+            style: TextStyle(
+              fontSize: 12,
+              color: isDark ? color.withOpacity(0.8) : color,
+            ),
+          ),
         ],
       ),
     );

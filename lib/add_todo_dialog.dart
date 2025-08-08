@@ -56,41 +56,101 @@ class _AddTodoDialogState extends State<AddTodoDialog> {
 
   @override
   Widget build(BuildContext context) {
+    final isDark = Theme.of(context).brightness == Brightness.dark;
+
     return AlertDialog(
-      title: const Text('Add New Task'),
+      backgroundColor: isDark ? const Color(0xFF1E1E1E) : null,
+      shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(16)),
+      title: Text(
+        'Add New Task',
+        style: TextStyle(
+          color: isDark ? const Color(0xFFE0E0E0) : null,
+          fontSize: 20,
+          fontWeight: FontWeight.w600,
+        ),
+      ),
       content: SingleChildScrollView(
         child: Column(
           crossAxisAlignment: CrossAxisAlignment.start,
           children: [
             TextField(
               controller: _titleController,
-              decoration: const InputDecoration(
+              style: TextStyle(color: isDark ? const Color(0xFFE0E0E0) : null),
+              decoration: InputDecoration(
                 labelText: 'Title *',
-                border: OutlineInputBorder(),
-                prefixIcon: Icon(Icons.task),
+                labelStyle: TextStyle(
+                  color: isDark ? const Color(0xFF909090) : null,
+                ),
+                border: const OutlineInputBorder(),
+                enabledBorder: OutlineInputBorder(
+                  borderSide: BorderSide(
+                    color: isDark ? const Color(0xFF404040) : Colors.grey[400]!,
+                  ),
+                ),
+                focusedBorder: const OutlineInputBorder(
+                  borderSide: BorderSide(color: Colors.blue),
+                ),
+                prefixIcon: Icon(
+                  Icons.task,
+                  color: isDark ? const Color(0xFF909090) : null,
+                ),
               ),
               maxLength: 50,
             ),
             const SizedBox(height: 16),
             TextField(
               controller: _descriptionController,
-              decoration: const InputDecoration(
+              style: TextStyle(color: isDark ? const Color(0xFFE0E0E0) : null),
+              decoration: InputDecoration(
                 labelText: 'Description',
-                border: OutlineInputBorder(),
-                prefixIcon: Icon(Icons.description),
+                labelStyle: TextStyle(
+                  color: isDark ? const Color(0xFF909090) : null,
+                ),
+                border: const OutlineInputBorder(),
+                enabledBorder: OutlineInputBorder(
+                  borderSide: BorderSide(
+                    color: isDark ? const Color(0xFF404040) : Colors.grey[400]!,
+                  ),
+                ),
+                focusedBorder: const OutlineInputBorder(
+                  borderSide: BorderSide(color: Colors.blue),
+                ),
+                prefixIcon: Icon(
+                  Icons.description,
+                  color: isDark ? const Color(0xFF909090) : null,
+                ),
               ),
               maxLines: 3,
               maxLength: 200,
             ),
             const SizedBox(height: 16),
             Card(
+              color: isDark ? const Color(0xFF2A2A2A) : null,
+              elevation: isDark ? 0 : null,
+              shape: RoundedRectangleBorder(
+                borderRadius: BorderRadius.circular(12),
+                side: isDark
+                    ? BorderSide(color: const Color(0xFF404040), width: 1)
+                    : BorderSide.none,
+              ),
               child: ListTile(
                 leading: const Icon(Icons.calendar_today, color: Colors.blue),
-                title: const Text('Date'),
+                title: Text(
+                  'Date',
+                  style: TextStyle(
+                    color: isDark ? const Color(0xFFE0E0E0) : null,
+                  ),
+                ),
                 subtitle: Text(
                   DateFormat('dd/MM/yyyy').format(_selectedScheduleDate),
+                  style: TextStyle(
+                    color: isDark ? const Color(0xFFB0B0B0) : null,
+                  ),
                 ),
-                trailing: const Icon(Icons.arrow_forward_ios),
+                trailing: Icon(
+                  Icons.arrow_forward_ios,
+                  color: isDark ? const Color(0xFF909090) : null,
+                ),
                 onTap: () async {
                   final date = await showDatePicker(
                     context: context,
@@ -110,11 +170,32 @@ class _AddTodoDialogState extends State<AddTodoDialog> {
             ),
             const SizedBox(height: 8),
             Card(
+              color: isDark ? const Color(0xFF2A2A2A) : null,
+              elevation: isDark ? 0 : null,
+              shape: RoundedRectangleBorder(
+                borderRadius: BorderRadius.circular(12),
+                side: isDark
+                    ? BorderSide(color: const Color(0xFF404040), width: 1)
+                    : BorderSide.none,
+              ),
               child: ListTile(
                 leading: const Icon(Icons.access_time, color: Colors.orange),
-                title: const Text('Time'),
-                subtitle: Text(_selectedTime.format(context)),
-                trailing: const Icon(Icons.arrow_forward_ios),
+                title: Text(
+                  'Time',
+                  style: TextStyle(
+                    color: isDark ? const Color(0xFFE0E0E0) : null,
+                  ),
+                ),
+                subtitle: Text(
+                  _selectedTime.format(context),
+                  style: TextStyle(
+                    color: isDark ? const Color(0xFFB0B0B0) : null,
+                  ),
+                ),
+                trailing: Icon(
+                  Icons.arrow_forward_ios,
+                  color: isDark ? const Color(0xFF909090) : null,
+                ),
                 onTap: () async {
                   final time = await showTimePicker(
                     context: context,
@@ -136,10 +217,20 @@ class _AddTodoDialogState extends State<AddTodoDialog> {
           onPressed: () {
             Navigator.pop(context);
           },
-          child: const Text('Cancel'),
+          child: Text(
+            'Cancel',
+            style: TextStyle(color: isDark ? const Color(0xFFB0B0B0) : null),
+          ),
         ),
         ElevatedButton.icon(
           onPressed: _addTodo,
+          style: ElevatedButton.styleFrom(
+            backgroundColor: const Color(0xFF2196F3),
+            foregroundColor: Colors.white,
+            shape: RoundedRectangleBorder(
+              borderRadius: BorderRadius.circular(8),
+            ),
+          ),
           icon: const Icon(Icons.add),
           label: const Text('Add'),
         ),

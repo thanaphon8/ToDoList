@@ -15,9 +15,16 @@ class TodoItemWidget extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) {
+    final isDark = Theme.of(context).brightness == Brightness.dark;
     final now = DateTime.now();
-    final isOverdue =
-        todo.fullScheduledDateTime.isBefore(now) && !todo.isCompleted;
+    final scheduledTime = todo.fullScheduledDateTime;
+
+    // คำนวณสถานะต่างๆ
+    final isOverdue = scheduledTime.isBefore(now) && !todo.isCompleted;
+    final isApproaching =
+        !todo.isCompleted &&
+        scheduledTime.isAfter(now) &&
+        scheduledTime.difference(now).inMinutes <= 30; // ใกล้ถึงเวลา 30 นาที
 
     return Container(
       margin: const EdgeInsets.only(bottom: 8),
@@ -36,8 +43,17 @@ class TodoItemWidget extends StatelessWidget {
         onDismissed: (direction) => onDismissed(),
         child: Container(
           decoration: BoxDecoration(
-            color: Colors.white,
+            color: isDark ? const Color(0xFF1E1E1E) : Colors.white,
             borderRadius: BorderRadius.circular(12),
+            boxShadow: isDark
+                ? null
+                : [
+                    BoxShadow(
+                      color: Colors.black.withOpacity(0.05),
+                      blurRadius: 4,
+                      offset: const Offset(0, 2),
+                    ),
+                  ],
           ),
           child: ListTile(
             tileColor: Colors.transparent,
@@ -54,6 +70,8 @@ class TodoItemWidget extends StatelessWidget {
                     ? Colors.green.withOpacity(0.15)
                     : isOverdue
                     ? Colors.red.withOpacity(0.15)
+                    : isApproaching
+                    ? Colors.red.withOpacity(0.15)
                     : Colors.blue.withOpacity(0.15),
               ),
               child: Icon(
@@ -61,10 +79,12 @@ class TodoItemWidget extends StatelessWidget {
                     ? Icons.check_circle
                     : isOverdue
                     ? Icons.schedule_outlined
+                    : isApproaching
+                    ? Icons.alarm
                     : Icons.schedule,
                 color: todo.isCompleted
                     ? Colors.green
-                    : isOverdue
+                    : isOverdue || isApproaching
                     ? Colors.red
                     : Colors.blue,
                 size: 20,
@@ -77,10 +97,10 @@ class TodoItemWidget extends StatelessWidget {
                     ? TextDecoration.lineThrough
                     : null,
                 color: todo.isCompleted
-                    ? Colors.grey
-                    : isOverdue
-                    ? Colors.red.shade700
-                    : Colors.black87,
+                    ? (isDark ? const Color(0xFF606060) : Colors.grey)
+                    : (isOverdue || isApproaching)
+                    ? Colors.red.shade400
+                    : (isDark ? const Color(0xFFE0E0E0) : Colors.black87),
                 fontWeight: FontWeight.w500,
                 fontSize: 16,
               ),
@@ -94,7 +114,9 @@ class TodoItemWidget extends StatelessWidget {
                     todo.description,
                     style: TextStyle(
                       fontSize: 14,
-                      color: todo.isCompleted ? Colors.grey : Colors.black54,
+                      color: todo.isCompleted
+                          ? (isDark ? const Color(0xFF606060) : Colors.grey)
+                          : (isDark ? const Color(0xFFB0B0B0) : Colors.black54),
                     ),
                   ),
                 ],
@@ -104,21 +126,28 @@ class TodoItemWidget extends StatelessWidget {
                     Icon(
                       Icons.access_time,
                       size: 16,
-                      color: isOverdue ? Colors.red : Colors.grey,
+                      color: (isOverdue || isApproaching)
+                          ? Colors.red.shade400
+                          : (isDark ? const Color(0xFF909090) : Colors.grey),
                     ),
                     const SizedBox(width: 4),
                     Text(
                       todo.scheduledTime.format(context),
                       style: TextStyle(
                         fontSize: 13,
-                        color: isOverdue ? Colors.red : Colors.grey[600],
-                        fontWeight: isOverdue
+                        color: (isOverdue || isApproaching)
+                            ? Colors.red.shade400
+                            : (isDark
+                                  ? const Color(0xFF909090)
+                                  : Colors.grey[600]),
+                        fontWeight: (isOverdue || isApproaching)
                             ? FontWeight.w600
                             : FontWeight.normal,
                       ),
                     ),
+                    const SizedBox(width: 8),
+                    // แสดง tags ต่างๆ
                     if (isOverdue) ...[
-                      const SizedBox(width: 8),
                       Container(
                         padding: const EdgeInsets.symmetric(
                           horizontal: 6,
@@ -130,6 +159,25 @@ class TodoItemWidget extends StatelessWidget {
                         ),
                         child: const Text(
                           'เลยเวลา',
+                          style: TextStyle(
+                            fontSize: 10,
+                            color: Colors.red,
+                            fontWeight: FontWeight.w600,
+                          ),
+                        ),
+                      ),
+                    ] else if (isApproaching) ...[
+                      Container(
+                        padding: const EdgeInsets.symmetric(
+                          horizontal: 6,
+                          vertical: 2,
+                        ),
+                        decoration: BoxDecoration(
+                          color: Colors.red.shade100,
+                          borderRadius: BorderRadius.circular(4),
+                        ),
+                        child: const Text(
+                          'ต้องทำ',
                           style: TextStyle(
                             fontSize: 10,
                             color: Colors.red,
