@@ -1,11 +1,16 @@
 import 'package:flutter/material.dart';
+import 'package:get/get.dart';
 import 'package:intl/intl.dart';
+
 import 'todo_model.dart';
 import 'todo_manager.dart';
 import 'todo_item_widget.dart';
 import 'add_todo_dialog.dart';
 import 'stats_widget.dart';
 import 'notification_controller.dart';
+import 'login_screen.dart';
+import 'register_screen.dart';
+import 'auth_controller.dart';
 
 void main() {
   runApp(const MyApp());
@@ -19,20 +24,18 @@ class MyApp extends StatefulWidget {
 }
 
 class _MyAppState extends State<MyApp> {
-  // เปลี่ยนจาก ThemeMode.system เป็น ThemeMode.light
+  final AuthController authController = Get.put(AuthController());
   ThemeMode _themeMode = ThemeMode.light;
 
   void _toggleTheme() {
     setState(() {
-      _themeMode = _themeMode == ThemeMode.dark
-          ? ThemeMode.light
-          : ThemeMode.dark;
+      _themeMode = _themeMode == ThemeMode.dark ? ThemeMode.light : ThemeMode.dark;
     });
   }
 
   @override
   Widget build(BuildContext context) {
-    return MaterialApp(
+    return GetMaterialApp(
       title: 'Calendar Todo App',
       theme: ThemeData(
         primarySwatch: Colors.blue,
@@ -42,7 +45,7 @@ class _MyAppState extends State<MyApp> {
         scaffoldBackgroundColor: Colors.grey[100],
         cardColor: Colors.white,
         appBarTheme: const AppBarTheme(
-          backgroundColor: const Color(0xFF2196F3),
+          backgroundColor: Color(0xFF2196F3),
           foregroundColor: Colors.white,
           elevation: 0,
         ),
@@ -52,21 +55,30 @@ class _MyAppState extends State<MyApp> {
         visualDensity: VisualDensity.adaptivePlatformDensity,
         useMaterial3: true,
         brightness: Brightness.dark,
-        scaffoldBackgroundColor: const Color(0xFF0A0A0A), // เกือบดำ แต่อ่านง่าย
-        cardColor: const Color(0xFF1E1E1E), // สี card ที่อ่านง่าย
+        scaffoldBackgroundColor: const Color(0xFF0A0A0A),
+        cardColor: const Color(0xFF1E1E1E),
         appBarTheme: const AppBarTheme(
-          backgroundColor: Color(0xFF1A1A1A), // สีแถบบน สุขุม
+          backgroundColor: Color(0xFF1A1A1A),
           foregroundColor: Colors.white,
           elevation: 0,
         ),
         floatingActionButtonTheme: const FloatingActionButtonThemeData(
-          backgroundColor: Color(0xFF2196F3), // น้ำเงินอ่อน
+          backgroundColor: Color(0xFF2196F3),
           foregroundColor: Colors.white,
         ),
       ),
       themeMode: _themeMode,
-      home: HomePage(onToggleTheme: _toggleTheme),
       debugShowCheckedModeBanner: false,
+      initialRoute: '/',
+      getPages: [
+        GetPage(name: '/', page: () => const LoginScreen()),
+        GetPage(name: '/login', page: () => const LoginScreen()),
+        GetPage(name: '/register', page: () => const RegisterScreen()),
+        GetPage(
+          name: '/home',
+          page: () => HomePage(onToggleTheme: _toggleTheme),
+        ),
+      ],
     );
   }
 }
@@ -113,9 +125,7 @@ class _HomePageState extends State<HomePage> {
     _loadTodos();
     NotificationController.showSuccess(
       context: context,
-      message: todo.isCompleted
-          ? 'Task marked as incomplete'
-          : 'Task completed!',
+      message: todo.isCompleted ? 'Task marked as incomplete' : 'Task completed!',
     );
   }
 
@@ -169,7 +179,6 @@ class _HomePageState extends State<HomePage> {
       ),
       body: Column(
         children: [
-          // Date Selector Header
           Container(
             color: headerColor,
             child: Padding(
@@ -178,23 +187,15 @@ class _HomePageState extends State<HomePage> {
                 mainAxisAlignment: MainAxisAlignment.spaceBetween,
                 children: [
                   IconButton(
-                    onPressed: () => _selectDate(
-                      _selectedDate.subtract(const Duration(days: 1)),
-                    ),
-                    icon: const Icon(
-                      Icons.chevron_left,
-                      color: Colors.white,
-                      size: 30,
-                    ),
+                    onPressed: () => _selectDate(_selectedDate.subtract(const Duration(days: 1))),
+                    icon: const Icon(Icons.chevron_left, color: Colors.white, size: 30),
                   ),
                   GestureDetector(
                     onTap: () async {
                       final date = await showDatePicker(
                         context: context,
                         initialDate: _selectedDate,
-                        firstDate: DateTime.now().subtract(
-                          const Duration(days: 365),
-                        ),
+                        firstDate: DateTime.now().subtract(const Duration(days: 365)),
                         lastDate: DateTime.now().add(const Duration(days: 365)),
                       );
                       _selectDate(date);
@@ -203,47 +204,28 @@ class _HomePageState extends State<HomePage> {
                       children: [
                         Text(
                           _selectedDate.day.toString(),
-                          style: const TextStyle(
-                            color: Colors.white,
-                            fontSize: 32,
-                            fontWeight: FontWeight.bold,
-                          ),
+                          style: const TextStyle(color: Colors.white, fontSize: 32, fontWeight: FontWeight.bold),
                         ),
                         Text(
                           DateFormat('MMMM yyyy').format(_selectedDate),
-                          style: const TextStyle(
-                            color: Colors.white70,
-                            fontSize: 14,
-                          ),
+                          style: const TextStyle(color: Colors.white70, fontSize: 14),
                         ),
                         Text(
                           DateFormat('EEEE').format(_selectedDate),
-                          style: const TextStyle(
-                            color: Colors.white70,
-                            fontSize: 12,
-                          ),
+                          style: const TextStyle(color: Colors.white70, fontSize: 12),
                         ),
                       ],
                     ),
                   ),
                   IconButton(
-                    onPressed: () =>
-                        _selectDate(_selectedDate.add(const Duration(days: 1))),
-                    icon: const Icon(
-                      Icons.chevron_right,
-                      color: Colors.white,
-                      size: 30,
-                    ),
+                    onPressed: () => _selectDate(_selectedDate.add(const Duration(days: 1))),
+                    icon: const Icon(Icons.chevron_right, color: Colors.white, size: 30),
                   ),
                 ],
               ),
             ),
           ),
-
-          // Stats Widget
           StatsWidget(stats: _stats),
-
-          // Todo List
           Expanded(
             child: Container(
               color: backgroundColor,
@@ -252,33 +234,16 @@ class _HomePageState extends State<HomePage> {
                       child: Column(
                         mainAxisAlignment: MainAxisAlignment.center,
                         children: [
-                          Icon(
-                            Icons.event_note,
-                            size: 80,
-                            color: isDark
-                                ? const Color(0xFF404040)
-                                : Colors.grey[400],
-                          ),
+                          Icon(Icons.event_note, size: 80, color: isDark ? const Color(0xFF404040) : Colors.grey[400]),
                           const SizedBox(height: 16),
                           Text(
                             'No tasks for today',
-                            style: TextStyle(
-                              fontSize: 18,
-                              color: isDark
-                                  ? const Color(0xFFB0B0B0)
-                                  : Colors.grey[600],
-                              fontWeight: FontWeight.w500,
-                            ),
+                            style: TextStyle(fontSize: 18, color: isDark ? const Color(0xFFB0B0B0) : Colors.grey[600], fontWeight: FontWeight.w500),
                           ),
                           const SizedBox(height: 8),
                           Text(
                             'Tap + to add a new task',
-                            style: TextStyle(
-                              fontSize: 14,
-                              color: isDark
-                                  ? const Color(0xFF808080)
-                                  : Colors.grey[500],
-                            ),
+                            style: TextStyle(fontSize: 14, color: isDark ? const Color(0xFF808080) : Colors.grey[500]),
                           ),
                         ],
                       ),
