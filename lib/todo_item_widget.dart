@@ -158,7 +158,7 @@ class TodoItemWidget extends StatelessWidget {
                           borderRadius: BorderRadius.circular(4),
                         ),
                         child: const Text(
-                          'เลยเวลา',
+                          'โดยด่วน',
                           style: TextStyle(
                             fontSize: 10,
                             color: Colors.red,
