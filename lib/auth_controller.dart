@@ -53,4 +53,8 @@ class AuthController extends GetxController {
     isLoggedIn.value = false;
     Get.offAllNamed('/login');
   }
+<<<<<<< HEAD
 }
+=======
+}
+>>>>>>> pathiphat

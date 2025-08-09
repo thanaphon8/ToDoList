@@ -1,3 +1,5 @@
+// todo_manager.dart
+
 import 'todo_model.dart';
 
 class TodoManager {
@@ -15,20 +17,27 @@ class TodoManager {
       description: todo.description,
       scheduledDate: todo.scheduledDate,
       scheduledTime: todo.scheduledTime,
-      createdAt: todo.createdAt,
+      createdAt: DateTime.now(), // ใช้ DateTime.now() เพื่อให้ตรงกับโค้ดเดิม
       isCompleted: todo.isCompleted,
     );
     _todos.add(newTodo);
   }
 
+  // เพิ่ม method สำหรับอัปเดต Todo
+  void updateTodo(TodoItem updatedTodo) {
+    final index = _todos.indexWhere((todo) => todo.id == updatedTodo.id);
+    if (index != -1) {
+      _todos[index] = updatedTodo;
+    }
+  }
+
   List<TodoItem> getTodosByDate(DateTime date) {
     final now = DateTime.now();
     return _todos.where((todo) => todo.isSameDate(date)).toList()..sort((a, b) {
-      // ถ้า a เสร็จแล้วแต่ b ยังไม่เสร็จ ให้ a ไปล่าง (return 1)
-      if (a.isCompleted && !b.isCompleted) return 1;
-      // ถ้า b เสร็จแล้วแต่ a ยังไม่เสร็จ ให้ b ไปล่าง (return -1)
-      if (b.isCompleted && !a.isCompleted) return -1;
+        if (a.isCompleted && !b.isCompleted) return 1;
+        if (b.isCompleted && !a.isCompleted) return -1;
 
+<<<<<<< HEAD
       // สำหรับรายการที่ยังไม่เสร็จ
       if (!a.isCompleted && !b.isCompleted) {
         final aScheduled = a.fullScheduledDateTime;
@@ -74,12 +83,25 @@ class TodoManager {
       final bScheduled = b.fullScheduledDateTime;
       return aScheduled.compareTo(bScheduled);
     });
+=======
+        final aScheduled = a.fullScheduledDateTime;
+        final bScheduled = b.fullScheduledDateTime;
+
+        if (!a.isCompleted && !b.isCompleted) {
+          final aDiff = aScheduled.difference(now).abs();
+          final bDiff = bScheduled.difference(now).abs();
+          return aDiff.compareTo(bDiff);
+        }
+        return aScheduled.compareTo(bScheduled);
+      });
+>>>>>>> pathiphat
   }
 
   void updateTodoStatus(int id, bool isCompleted) {
     final index = _todos.indexWhere((todo) => todo.id == id);
     if (index != -1) {
-      _todos[index].isCompleted = isCompleted;
+      // สร้าง TodoItem ใหม่ด้วยค่า isCompleted ที่อัปเดต
+      _todos[index] = _todos[index].copyWith(isCompleted: isCompleted);
     }
   }
 

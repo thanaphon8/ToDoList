@@ -6,7 +6,7 @@ import 'todo_model.dart';
 import 'todo_manager.dart';
 import 'todo_item_widget.dart';
 import 'add_todo_dialog.dart';
-import 'stats_widget.dart';
+
 import 'notification_controller.dart';
 import 'login_screen.dart';
 import 'register_screen.dart';
@@ -96,7 +96,6 @@ class _HomePageState extends State<HomePage> {
   final TodoManager _todoManager = TodoManager();
   List<TodoItem> _todos = [];
   DateTime _selectedDate = DateTime.now();
-  Map<String, int> _stats = {'total': 0, 'completed': 0, 'pending': 0};
 
   @override
   void initState() {
@@ -107,7 +106,6 @@ class _HomePageState extends State<HomePage> {
   void _loadTodos() {
     setState(() {
       _todos = _todoManager.getTodosByDate(_selectedDate);
-      _stats = _todoManager.getStatsByDate(_selectedDate);
     });
   }
 
@@ -134,7 +132,7 @@ class _HomePageState extends State<HomePage> {
     _loadTodos();
     NotificationController.showSuccess(
       context: context,
-      message: 'Task deleted successfully',
+      message: 'Task deleted successfully!',
     );
   }
 
@@ -145,11 +143,26 @@ class _HomePageState extends State<HomePage> {
         return AddTodoDialog(selectedDate: _selectedDate);
       },
     );
-
     if (result == true) {
       _loadTodos();
     }
   }
+
+  Future<void> _showEditTodoDialog(TodoItem todo) async {
+    final result = await showDialog<bool>(
+      context: context,
+      builder: (BuildContext context) {
+        return AddTodoDialog(
+          selectedDate: _selectedDate,
+          existingTodo: todo, // ส่ง TodoItem ที่ต้องการแก้ไขเข้าไป
+        );
+      },
+    );
+    if (result == true) {
+      _loadTodos();
+    }
+  }
+
 
   @override
   Widget build(BuildContext context) {
@@ -225,7 +238,14 @@ class _HomePageState extends State<HomePage> {
               ),
             ),
           ),
+<<<<<<< HEAD
           StatsWidget(stats: _stats),
+=======
+
+          // Stats Widget
+          
+          // Todo List
+>>>>>>> pathiphat
           Expanded(
             child: Container(
               color: backgroundColor,
@@ -253,10 +273,63 @@ class _HomePageState extends State<HomePage> {
                       itemCount: _todos.length,
                       itemBuilder: (context, index) {
                         final todo = _todos[index];
-                        return TodoItemWidget(
-                          todo: todo,
-                          onTap: () => _toggleTodoStatus(todo),
-                          onDismissed: () => _deleteTodo(todo),
+                        return Dismissible(
+                          key: ValueKey(todo.id),
+                          direction: DismissDirection.horizontal,
+                          background: Container(
+                            alignment: Alignment.centerLeft,
+                            padding: const EdgeInsets.symmetric(horizontal: 20),
+                            color: Colors.blue,
+                            child: const Icon(Icons.edit, color: Colors.white),
+                          ),
+                            secondaryBackground: Container(
+                            alignment: Alignment.centerRight,
+                            padding: const EdgeInsets.symmetric(horizontal: 20),
+                            color: Colors.red,
+                            child: const Icon(Icons.delete, color: Colors.white),
+                          ),
+      confirmDismiss: (direction) async {
+                            if (direction == DismissDirection.endToStart) {
+                              // ปัดไปทางซ้ายเพื่อลบ
+                              return await showDialog<bool>(
+                                context: context,
+                                builder: (context) {
+                                  return AlertDialog(
+                                    title: const Text('Delete Task'),
+                                    content: Text('Are you sure you want to delete "${todo.title}"?'),
+                                    actions: [
+                                      TextButton(
+                                        onPressed: () => Navigator.of(context).pop(false),
+                                        child: const Text('Cancel'),
+                                      ),
+                                      ElevatedButton(
+                                        onPressed: () => Navigator.of(context).pop(true),
+                                        style: ElevatedButton.styleFrom(
+                                          backgroundColor: Colors.red,
+                                        ),
+                                        child: const Text('Delete', style: TextStyle(color: Colors.white)),
+                                      ),
+                                    ],
+                                  );
+                                },
+                              );
+                            } else if (direction == DismissDirection.startToEnd) {
+                              // ปัดไปทางขวาเพื่อแก้ไข
+                              _showEditTodoDialog(todo);
+                              return false; // ไม่ให้ Dismiss
+                            }
+                            return null;
+                          },
+                          // เพิ่ม onDismissed handler เพื่อลบ widget ออกจาก tree อย่างถาวร
+                          onDismissed: (direction) {
+                            if (direction == DismissDirection.endToStart) {
+                              _deleteTodo(todo);
+                            }
+                          },
+                          child: TodoItemWidget(
+                            todo: todo,
+                            onTap: () => _toggleTodoStatus(todo),
+                          ),
                         );
                       },
                     ),

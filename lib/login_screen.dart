@@ -56,4 +56,8 @@ class _LoginScreenState extends State<LoginScreen> {
       ),
     );
   }
+<<<<<<< HEAD
 }
+=======
+}
+>>>>>>> pathiphat

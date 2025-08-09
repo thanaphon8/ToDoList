@@ -1,3 +1,5 @@
+// add_todo_dialog.dart
+
 import 'package:flutter/material.dart';
 import 'package:intl/intl.dart';
 import 'todo_model.dart';
@@ -6,8 +8,13 @@ import 'notification_controller.dart';
 
 class AddTodoDialog extends StatefulWidget {
   final DateTime selectedDate;
+  final TodoItem? existingTodo; // เพิ่ม parameter สำหรับ Todo ที่มีอยู่แล้ว
 
-  const AddTodoDialog({Key? key, required this.selectedDate}) : super(key: key);
+  const AddTodoDialog({
+    Key? key,
+    required this.selectedDate,
+    this.existingTodo, // ทำให้เป็น optional
+  }) : super(key: key);
 
   @override
   State<AddTodoDialog> createState() => _AddTodoDialogState();
@@ -24,11 +31,18 @@ class _AddTodoDialogState extends State<AddTodoDialog> {
   @override
   void initState() {
     super.initState();
-    _selectedScheduleDate = widget.selectedDate;
-    _selectedTime = TimeOfDay.now();
+    if (widget.existingTodo != null) {
+      _titleController.text = widget.existingTodo!.title;
+      _descriptionController.text = widget.existingTodo!.description;
+      _selectedScheduleDate = widget.existingTodo!.scheduledDate;
+      _selectedTime = widget.existingTodo!.scheduledTime;
+    } else {
+      _selectedScheduleDate = widget.selectedDate;
+      _selectedTime = TimeOfDay.now();
+    }
   }
 
-  void _addTodo() {
+  void _saveTodo() {
     if (_titleController.text.trim().isEmpty) {
       NotificationController.showError(
         context: context,
@@ -37,21 +51,37 @@ class _AddTodoDialogState extends State<AddTodoDialog> {
       return;
     }
 
-    final newTodo = TodoItem(
-      id: 0,
-      title: _titleController.text.trim(),
-      description: _descriptionController.text.trim(),
-      scheduledDate: _selectedScheduleDate,
-      scheduledTime: _selectedTime,
-      createdAt: DateTime.now(),
-    );
+    if (widget.existingTodo != null) {
+      // โหมดแก้ไข: อัปเดตรายการเดิม
+      final updatedTodo = widget.existingTodo!.copyWith(
+        title: _titleController.text.trim(),
+        description: _descriptionController.text.trim(),
+        scheduledDate: _selectedScheduleDate,
+        scheduledTime: _selectedTime,
+      );
+      _todoManager.updateTodo(updatedTodo);
+      NotificationController.showSuccess(
+        context: context,
+        message: 'Task updated successfully',
+      );
+    } else {
+      // โหมดเพิ่มใหม่: เพิ่มรายการใหม่
+      final newTodo = TodoItem(
+        id: 0,
+        title: _titleController.text.trim(),
+        description: _descriptionController.text.trim(),
+        scheduledDate: _selectedScheduleDate,
+        scheduledTime: _selectedTime,
+        createdAt: DateTime.now(),
+      );
+      _todoManager.addTodo(newTodo);
+      NotificationController.showSuccess(
+        context: context,
+        message: 'Task added successfully',
+      );
+    }
 
-    _todoManager.addTodo(newTodo);
-    Navigator.pop(context, true); // Return true to indicate success
-    NotificationController.showSuccess(
-      context: context,
-      message: 'Task added successfully',
-    );
+    Navigator.pop(context, true);
   }
 
   @override
@@ -62,7 +92,7 @@ class _AddTodoDialogState extends State<AddTodoDialog> {
       backgroundColor: isDark ? const Color(0xFF1E1E1E) : null,
       shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(16)),
       title: Text(
-        'Add New Task',
+        widget.existingTodo != null ? 'Edit Task' : 'Add New Task',
         style: TextStyle(
           color: isDark ? const Color(0xFFE0E0E0) : null,
           fontSize: 20,
@@ -223,7 +253,7 @@ class _AddTodoDialogState extends State<AddTodoDialog> {
           ),
         ),
         ElevatedButton.icon(
-          onPressed: _addTodo,
+          onPressed: _saveTodo, // เรียกใช้ method ที่แก้ไขแล้ว
           style: ElevatedButton.styleFrom(
             backgroundColor: const Color(0xFF2196F3),
             foregroundColor: Colors.white,
@@ -231,8 +261,8 @@ class _AddTodoDialogState extends State<AddTodoDialog> {
               borderRadius: BorderRadius.circular(8),
             ),
           ),
-          icon: const Icon(Icons.add),
-          label: const Text('Add'),
+          icon: Icon(widget.existingTodo != null ? Icons.save : Icons.add),
+          label: Text(widget.existingTodo != null ? 'Save' : 'Add'),
         ),
       ],
     );
