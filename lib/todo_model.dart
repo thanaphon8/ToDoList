@@ -1,3 +1,5 @@
+// todo_model.dart
+
 import 'package:flutter/material.dart';
 
 class TodoItem {
@@ -18,6 +20,27 @@ class TodoItem {
     required this.createdAt,
     this.isCompleted = false,
   });
+
+  // เพิ่ม method copyWith
+  TodoItem copyWith({
+    int? id,
+    String? title,
+    String? description,
+    DateTime? scheduledDate,
+    TimeOfDay? scheduledTime,
+    DateTime? createdAt,
+    bool? isCompleted,
+  }) {
+    return TodoItem(
+      id: id ?? this.id,
+      title: title ?? this.title,
+      description: description ?? this.description,
+      scheduledDate: scheduledDate ?? this.scheduledDate,
+      scheduledTime: scheduledTime ?? this.scheduledTime,
+      createdAt: createdAt ?? this.createdAt,
+      isCompleted: isCompleted ?? this.isCompleted,
+    );
+  }
 
   DateTime get fullScheduledDateTime {
     return DateTime(
