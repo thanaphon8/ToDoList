@@ -16,17 +16,17 @@ class AuthController extends GetxController {
     final existingUser = _userDB.any((user) => user['email'] == email);
 
     if (existingUser) {
-      ScaffoldMessenger.of(context).showSnackBar(
-        const SnackBar(content: Text('อีเมลนี้มีผู้ใช้แล้ว')),
-      );
+      ScaffoldMessenger.of(
+        context,
+      ).showSnackBar(const SnackBar(content: Text('อีเมลนี้มีผู้ใช้แล้ว')));
       return;
     }
 
     _userDB.add({'email': email, 'password': password});
 
-    ScaffoldMessenger.of(context).showSnackBar(
-      const SnackBar(content: Text('สมัครสมาชิกสำเร็จ')),
-    );
+    ScaffoldMessenger.of(
+      context,
+    ).showSnackBar(const SnackBar(content: Text('สมัครสมาชิกสำเร็จ')));
     Get.back(); // กลับไปหน้า login
   }
 
@@ -53,8 +53,4 @@ class AuthController extends GetxController {
     isLoggedIn.value = false;
     Get.offAllNamed('/login');
   }
-<<<<<<< HEAD
 }
-=======
-}
->>>>>>> pathiphat

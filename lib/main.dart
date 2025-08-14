@@ -29,7 +29,9 @@ class _MyAppState extends State<MyApp> {
 
   void _toggleTheme() {
     setState(() {
-      _themeMode = _themeMode == ThemeMode.dark ? ThemeMode.light : ThemeMode.dark;
+      _themeMode = _themeMode == ThemeMode.dark
+          ? ThemeMode.light
+          : ThemeMode.dark;
     });
   }
 
@@ -123,7 +125,9 @@ class _HomePageState extends State<HomePage> {
     _loadTodos();
     NotificationController.showSuccess(
       context: context,
-      message: todo.isCompleted ? 'Task marked as incomplete' : 'Task completed!',
+      message: todo.isCompleted
+          ? 'Task marked as incomplete'
+          : 'Task completed!',
     );
   }
 
@@ -163,7 +167,6 @@ class _HomePageState extends State<HomePage> {
     }
   }
 
-
   @override
   Widget build(BuildContext context) {
     final isDark = Theme.of(context).brightness == Brightness.dark;
@@ -188,6 +191,14 @@ class _HomePageState extends State<HomePage> {
             onPressed: widget.onToggleTheme,
             tooltip: 'Toggle Theme',
           ),
+          IconButton(
+            icon: const Icon(Icons.logout),
+            onPressed: () {
+              final AuthController authController = Get.find();
+              authController.logout();
+            },
+            tooltip: 'Logout',
+          ),
         ],
       ),
       body: Column(
@@ -200,15 +211,23 @@ class _HomePageState extends State<HomePage> {
                 mainAxisAlignment: MainAxisAlignment.spaceBetween,
                 children: [
                   IconButton(
-                    onPressed: () => _selectDate(_selectedDate.subtract(const Duration(days: 1))),
-                    icon: const Icon(Icons.chevron_left, color: Colors.white, size: 30),
+                    onPressed: () => _selectDate(
+                      _selectedDate.subtract(const Duration(days: 1)),
+                    ),
+                    icon: const Icon(
+                      Icons.chevron_left,
+                      color: Colors.white,
+                      size: 30,
+                    ),
                   ),
                   GestureDetector(
                     onTap: () async {
                       final date = await showDatePicker(
                         context: context,
                         initialDate: _selectedDate,
-                        firstDate: DateTime.now().subtract(const Duration(days: 365)),
+                        firstDate: DateTime.now().subtract(
+                          const Duration(days: 365),
+                        ),
                         lastDate: DateTime.now().add(const Duration(days: 365)),
                       );
                       _selectDate(date);
@@ -217,35 +236,43 @@ class _HomePageState extends State<HomePage> {
                       children: [
                         Text(
                           _selectedDate.day.toString(),
-                          style: const TextStyle(color: Colors.white, fontSize: 32, fontWeight: FontWeight.bold),
+                          style: const TextStyle(
+                            color: Colors.white,
+                            fontSize: 32,
+                            fontWeight: FontWeight.bold,
+                          ),
                         ),
                         Text(
                           DateFormat('MMMM yyyy').format(_selectedDate),
-                          style: const TextStyle(color: Colors.white70, fontSize: 14),
+                          style: const TextStyle(
+                            color: Colors.white70,
+                            fontSize: 14,
+                          ),
                         ),
                         Text(
                           DateFormat('EEEE').format(_selectedDate),
-                          style: const TextStyle(color: Colors.white70, fontSize: 12),
+                          style: const TextStyle(
+                            color: Colors.white70,
+                            fontSize: 12,
+                          ),
                         ),
                       ],
                     ),
                   ),
                   IconButton(
-                    onPressed: () => _selectDate(_selectedDate.add(const Duration(days: 1))),
-                    icon: const Icon(Icons.chevron_right, color: Colors.white, size: 30),
+                    onPressed: () =>
+                        _selectDate(_selectedDate.add(const Duration(days: 1))),
+                    icon: const Icon(
+                      Icons.chevron_right,
+                      color: Colors.white,
+                      size: 30,
+                    ),
                   ),
                 ],
               ),
             ),
           ),
-<<<<<<< HEAD
-          StatsWidget(stats: _stats),
-=======
-
-          // Stats Widget
-          
           // Todo List
->>>>>>> pathiphat
           Expanded(
             child: Container(
               color: backgroundColor,
@@ -254,16 +281,33 @@ class _HomePageState extends State<HomePage> {
                       child: Column(
                         mainAxisAlignment: MainAxisAlignment.center,
                         children: [
-                          Icon(Icons.event_note, size: 80, color: isDark ? const Color(0xFF404040) : Colors.grey[400]),
+                          Icon(
+                            Icons.event_note,
+                            size: 80,
+                            color: isDark
+                                ? const Color(0xFF404040)
+                                : Colors.grey[400],
+                          ),
                           const SizedBox(height: 16),
                           Text(
                             'No tasks for today',
-                            style: TextStyle(fontSize: 18, color: isDark ? const Color(0xFFB0B0B0) : Colors.grey[600], fontWeight: FontWeight.w500),
+                            style: TextStyle(
+                              fontSize: 18,
+                              color: isDark
+                                  ? const Color(0xFFB0B0B0)
+                                  : Colors.grey[600],
+                              fontWeight: FontWeight.w500,
+                            ),
                           ),
                           const SizedBox(height: 8),
                           Text(
                             'Tap + to add a new task',
-                            style: TextStyle(fontSize: 14, color: isDark ? const Color(0xFF808080) : Colors.grey[500]),
+                            style: TextStyle(
+                              fontSize: 14,
+                              color: isDark
+                                  ? const Color(0xFF808080)
+                                  : Colors.grey[500],
+                            ),
                           ),
                         ],
                       ),
@@ -282,13 +326,16 @@ class _HomePageState extends State<HomePage> {
                             color: Colors.blue,
                             child: const Icon(Icons.edit, color: Colors.white),
                           ),
-                            secondaryBackground: Container(
+                          secondaryBackground: Container(
                             alignment: Alignment.centerRight,
                             padding: const EdgeInsets.symmetric(horizontal: 20),
                             color: Colors.red,
-                            child: const Icon(Icons.delete, color: Colors.white),
+                            child: const Icon(
+                              Icons.delete,
+                              color: Colors.white,
+                            ),
                           ),
-      confirmDismiss: (direction) async {
+                          confirmDismiss: (direction) async {
                             if (direction == DismissDirection.endToStart) {
                               // ปัดไปทางซ้ายเพื่อลบ
                               return await showDialog<bool>(
@@ -296,31 +343,38 @@ class _HomePageState extends State<HomePage> {
                                 builder: (context) {
                                   return AlertDialog(
                                     title: const Text('Delete Task'),
-                                    content: Text('Are you sure you want to delete "${todo.title}"?'),
+                                    content: Text(
+                                      'Are you sure you want to delete "${todo.title}"?',
+                                    ),
                                     actions: [
                                       TextButton(
-                                        onPressed: () => Navigator.of(context).pop(false),
+                                        onPressed: () =>
+                                            Navigator.of(context).pop(false),
                                         child: const Text('Cancel'),
                                       ),
                                       ElevatedButton(
-                                        onPressed: () => Navigator.of(context).pop(true),
+                                        onPressed: () =>
+                                            Navigator.of(context).pop(true),
                                         style: ElevatedButton.styleFrom(
                                           backgroundColor: Colors.red,
                                         ),
-                                        child: const Text('Delete', style: TextStyle(color: Colors.white)),
+                                        child: const Text(
+                                          'Delete',
+                                          style: TextStyle(color: Colors.white),
+                                        ),
                                       ),
                                     ],
                                   );
                                 },
                               );
-                            } else if (direction == DismissDirection.startToEnd) {
+                            } else if (direction ==
+                                DismissDirection.startToEnd) {
                               // ปัดไปทางขวาเพื่อแก้ไข
                               _showEditTodoDialog(todo);
                               return false; // ไม่ให้ Dismiss
                             }
                             return null;
                           },
-                          // เพิ่ม onDismissed handler เพื่อลบ widget ออกจาก tree อย่างถาวร
                           onDismissed: (direction) {
                             if (direction == DismissDirection.endToStart) {
                               _deleteTodo(todo);

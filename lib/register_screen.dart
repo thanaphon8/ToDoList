@@ -52,8 +52,4 @@ class _RegisterScreenState extends State<RegisterScreen> {
       ),
     );
   }
-<<<<<<< HEAD
 }
-=======
-}
->>>>>>> pathiphat

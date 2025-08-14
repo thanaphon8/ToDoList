@@ -34,67 +34,19 @@ class TodoManager {
   List<TodoItem> getTodosByDate(DateTime date) {
     final now = DateTime.now();
     return _todos.where((todo) => todo.isSameDate(date)).toList()..sort((a, b) {
-        if (a.isCompleted && !b.isCompleted) return 1;
-        if (b.isCompleted && !a.isCompleted) return -1;
+      if (a.isCompleted && !b.isCompleted) return 1;
+      if (b.isCompleted && !a.isCompleted) return -1;
 
-<<<<<<< HEAD
-      // สำหรับรายการที่ยังไม่เสร็จ
-      if (!a.isCompleted && !b.isCompleted) {
-        final aScheduled = a.fullScheduledDateTime;
-        final bScheduled = b.fullScheduledDateTime;
-
-        // คำนวณสถานะต่างๆ
-        final aIsOverdue = aScheduled.isBefore(now);
-        final bIsOverdue = bScheduled.isBefore(now);
-        final aIsApproaching =
-            !aIsOverdue &&
-            aScheduled.isAfter(now) &&
-            aScheduled.difference(now).inMinutes <= 30;
-        final bIsApproaching =
-            !bIsOverdue &&
-            bScheduled.isAfter(now) &&
-            bScheduled.difference(now).inMinutes <= 30;
-
-        // Priority 1: รายการที่ใกล้ถึงเวลา (ต้องทำ) ขึ้นบนสุด
-        if (aIsApproaching && !bIsApproaching) return -1;
-        if (bIsApproaching && !aIsApproaching) return 1;
-
-        // Priority 2: รายการที่เลยเวลาแล้ว
-        if (aIsOverdue && !bIsOverdue) return -1;
-        if (bIsOverdue && !aIsOverdue) return 1;
-
-        // ถ้าเป็น category เดียวกัน เรียงตามเวลา
-        if (aIsApproaching && bIsApproaching) {
-          // ใกล้ถึงเวลา: ใครใกล้กว่าขึ้นก่อน
-          final aDiff = aScheduled.difference(now).abs();
-          final bDiff = bScheduled.difference(now).abs();
-          return aDiff.compareTo(bDiff);
-        } else if (aIsOverdue && bIsOverdue) {
-          // เลยเวลา: ใครเลยเวลานานกว่าขึ้นก่อน
-          return bScheduled.compareTo(aScheduled);
-        } else {
-          // รายการปกติ: เรียงตามเวลาปกติ
-          return aScheduled.compareTo(bScheduled);
-        }
-      }
-
-      // สำหรับรายการที่เสร็จแล้ว เรียงตามเวลาปกติ
       final aScheduled = a.fullScheduledDateTime;
       final bScheduled = b.fullScheduledDateTime;
+
+      if (!a.isCompleted && !b.isCompleted) {
+        final aDiff = aScheduled.difference(now).abs();
+        final bDiff = bScheduled.difference(now).abs();
+        return aDiff.compareTo(bDiff);
+      }
       return aScheduled.compareTo(bScheduled);
     });
-=======
-        final aScheduled = a.fullScheduledDateTime;
-        final bScheduled = b.fullScheduledDateTime;
-
-        if (!a.isCompleted && !b.isCompleted) {
-          final aDiff = aScheduled.difference(now).abs();
-          final bDiff = bScheduled.difference(now).abs();
-          return aDiff.compareTo(bDiff);
-        }
-        return aScheduled.compareTo(bScheduled);
-      });
->>>>>>> pathiphat
   }
 
   void updateTodoStatus(int id, bool isCompleted) {

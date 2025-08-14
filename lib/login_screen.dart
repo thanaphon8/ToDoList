@@ -50,14 +50,10 @@ class _LoginScreenState extends State<LoginScreen> {
             TextButton(
               onPressed: () => Get.toNamed('/register'),
               child: const Text('สมัครสมาชิก'),
-            )
+            ),
           ],
         ),
       ),
     );
   }
-<<<<<<< HEAD
 }
-=======
-}
->>>>>>> pathiphat
